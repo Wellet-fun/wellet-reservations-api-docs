@@ -3,12 +3,17 @@ This repository contains documentation for using the [Wellet](https://wellet.us/
 
 This api is organized around [REST](https://en.wikipedia.org/wiki/REST), accepts [JSON](https://www.json.org/json-en.html) request bodies, returns [JSON-encoded](https://www.json.org/json-en.html) responses, and uses standard HTTP response codes and verbs.
 
-## Base URL
 
+## Environments
+Wellet provides a production environment and a sandbox environment. The sandbox environment allows developers to integrate with the Wellet platform without affecting critical data. All the reservations functionality is fully implemented in both environments. Sandbox is important for testing the functionality and logic of third party applications before deploying to production or releasing to customers.
+
+## Base URLs
 The Reservations API is served over HTTPs. All URLs referenced in the documentation have the following base:
-```
-https://wr-api.wellet.cloud
-```
+
+| Environment |          Base URL           |
+|:-----------:|:---------------------------:|
+| Production  | https://wr-api.wellet.cloud |
+| Sandbox     | https://wr-dev.wellet.dev   |
 
 ## Authentication
 
@@ -38,7 +43,7 @@ Returns an array of venue, each venue containing the following properties:
 
 Example request:
 ```bash
-curl --location --request GET 'https://wr-api.wellet.cloud/venues/' \
+curl --location --request GET 'https://wr-dev.wellet.dev/venues/' \
 --header 'x-api-key: YOUR_API_KEY'
 ```
 
@@ -91,7 +96,7 @@ Returns an array of reservations, each of them with the following properties:
 
 Example request:
 ```bash
-curl --location --request GET 'https://wr-api.wellet.cloud/venues/chambao-cancun/reservations?date=2024-01-04' \
+curl --location --request GET 'https://wr-dev.wellet.dev/venues/chambao-cancun/reservations?date=2024-01-04' \
 --header 'x-api-key: YOUR_API_KEY'
 ```
 
@@ -146,7 +151,7 @@ If the reservation is found and it is confirmed, returns a reservation with the 
 
 Example request:
 ```bash
-curl --location --request GET 'https://wr-api.wellet.cloud/venues/chambao-cancun/reservations/GFAL' \
+curl --location --request GET 'https://wr-dev.wellet.dev/venues/chambao-cancun/reservations/GFAL' \
 --header 'x-api-key: YOUR_API_KEY'
 ```
 
@@ -211,7 +216,7 @@ The following HTTP Status Codes can be returned by this endpoint:
 
 Example request:
 ```bash
-curl --location --request PUT 'https://wr-api.wellet.cloud/venues/chambao-cancun/reservations/GFAL/payment' \
+curl --location --request PUT 'https://wr-dev.wellet.dev/venues/chambao-cancun/reservations/GFAL/payment' \
 --header 'x-api-key: YOUR_API_KEY' \
 --header 'Content-Type: application/json' \
 --data-raw '{
