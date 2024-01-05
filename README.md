@@ -84,7 +84,8 @@ Returns an array of reservations, each of them with the following properties:
 | date      | string  | Reservation date in "yyyy-mm-dd" format.               |
 | time      | string  | Reservation time in "hh:mm" 24-hour notation format.   |
 | paxs      | int     | Number of people in the group.                         |
-| conciergeName | string | Name of the concierge that generated the reservation |
+| customerName | string | Full name of the customer associated with the reservation |
+| conciergeName | string | Full name of the concierge that generated the reservation |
 
 #### Example
 
@@ -102,6 +103,7 @@ Example response:
         "date": "2024-01-04",
         "time": "20:00",
         "paxs": 4,
+        "customerName": "Laura Garcia",
         "conciergeName": "Diego Sánchez"
     },
     {
@@ -109,6 +111,7 @@ Example response:
         "date": "2024-01-04",
         "time": "20:30",
         "paxs": 8,
+        "customerName": "Eduardo Lopez",
         "conciergeName": "Valeria Pérez"
     }
 ]
@@ -136,6 +139,7 @@ If the reservation is found and it is confirmed, returns a reservation with the 
 | date      | string  | Reservation date in "yyyy-mm-dd" format.               |
 | time      | string  | Reservation time in "hh:mm" 24-hour notation format.   |
 | paxs      | int     | Number of people in the group.                         |
+| customerName | string | Full name of the customer associated with the reservation |
 | conciergeName | string | Name of the concierge that generated the reservation |
 
 #### Example
@@ -153,6 +157,7 @@ Example response:
     "date": "2024-01-04",
     "time": "20:30",
     "paxs": 8,
+    "customerName": "Eduardo Lopez",
     "conciergeName": "Valeria Pérez"
 }
 ```
@@ -164,7 +169,7 @@ The following HTTP Status Codes can be returned by this endpoint:
 | 404       | Not Found | The reservation was not found or it is  not confirmed (for example: it has been cancelled).|
 
 ## Register a payment for a reservation
-Registers a new payment for a particular reservation. If this endpoint is called multiple times for the same reservation code, the payments will be added to the reservation.
+Registers a new payment for a particular reservation. If this endpoint is called multiple times with differnt payment ids for the same reservation code, multiple payments will be added to the reservation. Note: if two payments are registered with the same id for the same reservation, only the first one will be registered, as the api assumes that this is a duplicated record sent by accident.
 
 ```
 PUT /venues/{venueId}/reservations/{reservationCode}/payment
@@ -188,8 +193,11 @@ If the payment was successfully registered, the following parameters are returne
 | date      | string  | Reservation date in "yyyy-mm-dd" format.               |
 | time      | string  | Reservation time in "hh:mm" 24-hour notation format.   |
 | paxs      | int     | Number of people in the group.                         |
+| customerName | string | Full name of the customer associated with the reservation |
+| conciergeName | string | Name of the concierge that generated the reservation |
 | totalPaidAmount | number | Total amount paid for this order (sum of all payments received) |
 | currency      | string  | Currency of payments. |
+| payments  | array | Array of [payment](./Payment.md) objects|
 
 #### Error Codes
 The following HTTP Status Codes can be returned by this endpoint:
@@ -220,7 +228,23 @@ Example response:
     "date": "2024-01-04",
     "time": "20:30",
     "paxs": 8,
-    "totalPaidAmount": 15383.25,
-    "currency": "MXN"
+    "customerName": "Eduardo Lopez",
+    "conciergeName": "Valeria Pérez",
+    "totalPaidAmount": 20383.25,
+    "currency": "MXN",
+    "payments": [
+        {
+            "id": "ABC122",
+            "amount": 5000.00,
+            "currency": "MXN",
+            "createdAtUtc": "2024-01-04T21:01:53.31"
+        },
+        {
+            "id": "ABC123",
+            "amount": 15383.25,
+            "currency": "MXN",
+            "createdAtUtc": "2024-01-05T21:05:03.3706244Z"
+        }
+    ]
 }
 ```
