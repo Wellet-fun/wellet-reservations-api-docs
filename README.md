@@ -69,7 +69,7 @@ Example response:
 ]
 ```
 ## Get Venue Reservations
-Returns the list of reservations confirmed for a particular venue and a particular date.
+Returns the list of reservations confirmed for a particular venue and a particular date. Note: reservations that have reached the maximum number of payments are not returned, as they are not valid anymore to record payments.
 
 ```
 GET /venues/{venueId}/reservations
@@ -166,12 +166,30 @@ Example response:
     "conciergeName": "Valeria Pérez"
 }
 ```
+
 #### Error Codes
 The following HTTP Status Codes can be returned by this endpoint:
 
 | Code      | Status    | Description                                            |
 |-----------|---------|--------------------------------------------------------|
-| 404       | Not Found | The reservation was not found or it is  not confirmed (for example: it has been cancelled).|
+| 400       | Bad Request | The reservation was found but it is not valid for receiving payments. One of the following error codes are returned in the response: <br>- `MAX_PAYMENTS_REACHED`: The number of payments received for this reservation has reached its limit.|
+| 404       | Not Found | The reservation was not found or it is  not confirmed (for example: it has been cancelled). The error description returned is `RESERVATION_NOT_FOUND`|
+
+Example error responses:
+
+```json
+{
+    "code": 400,
+    "errorDescription": "MAX_PAYMENTS_REACHED"
+}
+```
+
+```json
+{
+    "code": 403,
+    "errorDescription": "RESERVATION_NOT_FOUND"
+}
+```
 
 ## Register a payment for a reservation
 Registers a new payment for a particular reservation. If this endpoint is called multiple times with differnt payment ids for the same reservation code, multiple payments will be added to the reservation. Note: if two payments are registered with the same id for the same reservation, only the first one will be registered, as the api assumes that this is a duplicated record sent by accident.
@@ -188,6 +206,12 @@ PUT /venues/{venueId}/reservations/{reservationCode}/payment
 | paymentId      | Body | string  | Any string identifying the payment (optional). |
 | amount      | Body | number  | Amount paid. |
 | currency      | Body | string  | Currency of payment. Possible values: 'MXN' |
+| tableNumber | Body | string | Table number or identifier, as it is displayed to the final user.|
+| paxs | Body | number | Number of people in the group.|
+| openedAt | Body | date | Timestamp when this particular table was opened in the system. Format: `yyyy-MM-ddTHH:mm:ss` (ISO 8601 format in local time)|
+| hasDiscount | Body | boolean | True if a discount was applied to this table. (Optional, false by default) |
+| discountName | Body | string | Name of the discount applied (optional). |
+| discountAmount | Body | number | The amount of the discount applied, if any. (Optional, default: 0)|
 
 #### Output Parameters
 If the payment was successfully registered, the following parameters are returned:
@@ -195,8 +219,8 @@ If the payment was successfully registered, the following parameters are returne
 | Parameter | Type    | Description                                            |
 |-----------|---------|--------------------------------------------------------|
 | code      | string  | Reservation code                                       |
-| date      | string  | Reservation date in "yyyy-mm-dd" format.               |
-| time      | string  | Reservation time in "hh:mm" 24-hour notation format.   |
+| date      | string  | Reservation date in "yyyy-MM-dd" format.               |
+| time      | string  | Reservation time in "HH:mm" 24-hour notation format.   |
 | paxs      | int     | Number of people in the group.                         |
 | customerName | string | Full name of the customer associated with the reservation |
 | conciergeName | string | Name of the concierge that generated the reservation |
@@ -210,6 +234,7 @@ The following HTTP Status Codes can be returned by this endpoint:
 | Code      | Status    | Description                                            |
 |-----------|---------|--------------------------------------------------------|
 | 200       | OK      | The payment was successfully registered. |
+| 400       | Bad Request | The reservation was found but it is not valid for receiving payments. One of the following error codes are returned in the response: <br>- `MAX_PAYMENTS_REACHED`: The number of payments received for this reservation has reached its limit.|
 | 404       | Not Found | The reservation was not found or it is  not confirmed (for example: it has been cancelled).|
 
 #### Example
@@ -222,7 +247,13 @@ curl --location --request PUT 'https://wr-dev.wellet.dev/venues/chambao-cancun/r
 --data-raw '{
     "paymentId": "ABC123",
     "amount": 15383.25,
-    "currency": "MXN"
+    "currency": "MXN",
+    "tableNumber": "23",
+    "paxs": 8,
+    "openedAt": "2024-01-04T13:23:58",
+    "hasDiscount": true,
+    "discountName": "Locales",
+    "discountAmount": 1709.25
 }'
 ```
 
