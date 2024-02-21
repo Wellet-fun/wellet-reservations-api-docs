@@ -212,6 +212,8 @@ PUT /venues/{venueId}/reservations/{reservationCode}/payment
 | hasDiscount | Body | boolean | True if a discount was applied to this table. (Optional, false by default) |
 | discountName | Body | string | Name of the discount applied (optional). |
 | discountAmount | Body | number | The amount of the discount applied, if any. (Optional, default: 0)|
+| checkNumber | Body | string | The check nunber of the table. (optional)|
+| events | Body | [events](./Events.md) | Date and user information about events detailed [here](./Events.md). (Optional)|
 
 #### Output Parameters
 If the payment was successfully registered, the following parameters are returned:
@@ -253,7 +255,30 @@ curl --location --request PUT 'https://wr-dev.wellet.dev/venues/chambao-cancun/r
     "openedAt": "2024-01-04T13:23:58",
     "hasDiscount": true,
     "discountName": "Locales",
-    "discountAmount": 1709.25
+    "discountAmount": 1709.25,
+    "checkNumber": "205",
+    "events": {
+        "tableOpened": {
+            "date": "2024-01-04T13:23:58",
+            "userId": "a38e8b20-7299-4b5b-b6b6-cb86a472fd9f"
+            "userFullName": "Alejandra Ramírez"
+        },
+        "welletCodeAdded": {
+            "date": "2024-01-04T13:28:12",
+            "userId": "f4a6e7d3-8211-4e0d-bd3c-ee7f10706c87"
+            "userFullName": "Carlos Rodríguez"
+        },
+        "tableClosed": {
+            "date": "2024-01-04T15:33:02",
+            "userId": "7f64c20d-9cb1-4a7e-8c84-91e96f4240a3"
+            "userFullName": "Luis Gonzalez"
+        },
+        "tablePaid": {
+            "date": "2024-01-04T15:35:19",
+            "userId": "7f64c20d-9cb1-4a7e-8c84-91e96f4240a3"
+            "userFullName": "Luis Gonzalez"
+        }
+    }
 }'
 ```
 
