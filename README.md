@@ -213,7 +213,9 @@ PUT /venues/{venueId}/reservations/{reservationCode}/payment
 | discountName | Body | string | Name of the discount applied (optional). |
 | discountAmount | Body | number | The amount of the discount applied, if any. (Optional, default: 0)|
 | checkNumber | Body | string | The check nunber of the table. (optional)|
+| checkUrl | Body | string | Check url containing a PDF file or image of the check (optional)|
 | events | Body | [events](./Events.md) | Date and user information about events detailed [here](./Events.md). (Optional)|
+| reservationDate | Body | string | Reservation date. Format: "yyyy-mm-dd". Optional, only needed when reservation is closed and it is needed to patch payments not registered for some reason.|
 
 #### Output Parameters
 If the payment was successfully registered, the following parameters are returned:
@@ -257,6 +259,8 @@ curl --location --request PUT 'https://wr-dev.wellet.dev/venues/chambao-cancun/r
     "discountName": "Locales",
     "discountAmount": 1709.25,
     "checkNumber": "205",
+    "checkUrl": "https://billing-xyz.com/checks/check205.pdf",
+    "reservationDate": "2024-01-04",
     "events": {
         "tableOpened": {
             "date": "2024-01-04T13:23:58",
@@ -278,7 +282,7 @@ curl --location --request PUT 'https://wr-dev.wellet.dev/venues/chambao-cancun/r
             "userId": "7f64c20d-9cb1-4a7e-8c84-91e96f4240a3",
             "userFullName": "Luis Gonzalez"
         }
-    }
+    },
 }'
 ```
 
