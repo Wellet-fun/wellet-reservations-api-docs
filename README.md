@@ -13,7 +13,7 @@ The Reservations API is served over HTTPs. All URLs referenced in the documentat
 | Environment |          Base URL           |
 |:-----------:|:---------------------------:|
 | Production  | https://wr-api.wellet.cloud |
-| Sandbox     | https://wr-dev.wellet.dev   |
+| Sandbox     | https://wr-api.wellet.dev   |
 
 ## Authentication
 
