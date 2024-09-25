@@ -43,7 +43,7 @@ Returns an array of venue, each venue containing the following properties:
 
 Example request:
 ```bash
-curl --location --request GET 'https://wr-dev.wellet.dev/venues/' \
+curl --location --request GET 'https://wr-api.wellet.dev/venues/' \
 --header 'x-api-key: YOUR_API_KEY'
 ```
 
@@ -96,7 +96,7 @@ Returns an array of reservations, each of them with the following properties:
 
 Example request:
 ```bash
-curl --location --request GET 'https://wr-dev.wellet.dev/venues/chambao-cancun/reservations?date=2024-01-04' \
+curl --location --request GET 'https://wr-api.wellet.dev/venues/chambao-cancun/reservations?date=2024-01-04' \
 --header 'x-api-key: YOUR_API_KEY'
 ```
 
@@ -121,6 +121,17 @@ Example response:
     }
 ]
 ```
+# POS Communication
+Wellet requires the payment amount for each reservation made on its platform in order to calculate and allocate commissions. To achieve this, communication with the POS system responsible for processing payments is necessary.
+
+The mapping between Wellet reservations and POS transactions is facilitated through one of the following mechanisms:
+
+* By [Reservation Code](#by-reservation-code)
+* By [Table Id](#by-table-id)
+
+Mapping via table ID is only applicable when table assignments are managed within the Wellet platform.
+
+# By Reservation Code
 
 ## Get Reservation by code
 Returns a particular reservation by its code. This endpoint can be used to validate if a particular reservation code is valid.
@@ -151,7 +162,7 @@ If the reservation is found and it is confirmed, returns a reservation with the 
 
 Example request:
 ```bash
-curl --location --request GET 'https://wr-dev.wellet.dev/venues/chambao-cancun/reservations/GFAL' \
+curl --location --request GET 'https://wr-api.wellet.dev/venues/chambao-cancun/reservations/GFAL' \
 --header 'x-api-key: YOUR_API_KEY'
 ```
 
@@ -186,13 +197,13 @@ Example error responses:
 
 ```json
 {
-    "code": 403,
+    "code": 404,
     "errorDescription": "RESERVATION_NOT_FOUND"
 }
 ```
 
-## Register a payment for a reservation
-Registers a new payment for a particular reservation. If this endpoint is called multiple times with differnt payment ids for the same reservation code, multiple payments will be added to the reservation. Note: if two payments are registered with the same id for the same reservation, only the first one will be registered, as the api assumes that this is a duplicated record sent by accident.
+## Register a payment for a reservation by reservation code
+Registers a new payment for a particular reservation. If this endpoint is called multiple times with different payment ids for the same reservation code, multiple payments will be added to the reservation. Note: if two payments are registered with the same id for the same reservation, only the first one will be registered, as the api assumes that this is a duplicated record sent by accident.
 
 ```
 PUT /venues/{venueId}/reservations/{reservationCode}/payment
@@ -245,7 +256,7 @@ The following HTTP Status Codes can be returned by this endpoint:
 
 Example request:
 ```bash
-curl --location --request PUT 'https://wr-dev.wellet.dev/venues/chambao-cancun/reservations/GFAL/payment' \
+curl --location --request PUT 'https://wr-api.wellet.dev/venues/chambao-cancun/reservations/GFAL/payment' \
 --header 'x-api-key: YOUR_API_KEY' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -313,3 +324,196 @@ Example response:
     ]
 }
 ```
+
+
+# By Table Id
+It is essential to ensure that table IDs are created in the Wellet platform exactly as they are recorded in the POS system. Failure to do so will result in the mapping not functioning correctly.
+
+## Open a table from POS
+Notifies Wellet that a table has been opened in the POS system, allowing Wellet to begin recording payments for the reservation. It is crucial that the table is assigned in Wellet prior to it being opened in the POS.
+
+```
+POST /venues/{venueId}/table/{tableId}/open
+```
+
+#### Input Parameters
+| Parameter | Location     | Type    | Description                                                  |
+|-----------|--------------|---------|--------------------------------------------------------------|
+| venueId   | Path         | string  | Venue identifier                                             |
+| tableId | Path | string  | Table identifier. |
+
+
+#### Output Parameters
+If the reservation is found and it is confirmed, returns a reservation with the following properties:
+
+| Parameter | Type    | Description                                            |
+|-----------|---------|--------------------------------------------------------|
+| code      | string  | Reservation code                                       |
+| date      | string  | Reservation date in "yyyy-mm-dd" format.               |
+| time      | string  | Reservation time in "hh:mm" 24-hour notation format.   |
+| paxs      | int     | Number of people in the group.                         |
+| customerName | string | Full name of the customer associated with the reservation |
+| conciergeName | string | Name of the concierge that generated the reservation |
+| deposit | [deposit](./Deposit.md) | Deposit paid by guest for confirming the reservation | 
+ 
+
+#### Example
+
+Example request:
+```bash
+curl --location --request POST 'https://wr-api.wellet.dev/venues/chambao-cancun/table/12/open' \
+--header 'x-api-key: YOUR_API_KEY'
+```
+
+Example response:
+```json
+{
+    "code": "GFAL",
+    "date": "2024-01-04",
+    "time": "20:30",
+    "paxs": 8,
+    "customerName": "Eduardo Lopez",
+    "conciergeName": "Valeria Pérez",
+    "deposit": [
+        "amount": 1500,
+        "currency": "MXN",
+        "transactions": [
+            {
+                "id": 23,
+                "amount": 1100.00,
+                "currency": "MXN",
+                "paidAtUtc": "2024-01-02T13:23:58"
+            },
+            {
+                "id": 25,
+                "amount": 400.00,
+                "currency": "MXN",
+                "paidAtUtc": "2024-01-02T13:28:58"
+            }
+        ]
+    ]
+}
+```
+
+#### Error Codes
+The following HTTP Status Codes can be returned by this endpoint:
+
+| Code      | Status    | Description                                            |
+|-----------|---------|--------------------------------------------------------|
+| 404       | Not Found | The venue or table was not found. The error description returned is one of: `TABLE_NOT_FOUND`, `VENUE_NOT_FOUND`.|
+
+Example error responses:
+
+```json
+{
+    "code": 404,
+    "errorDescription": "TABLE_NOT_FOUND"
+}
+```
+
+```json
+{
+    "code": 404,
+    "errorDescription": "VENUE_NOT_FOUND"
+}
+```
+
+## Register a payment for a reservation by table id
+Registers a new payment for a particular table. If this endpoint is called multiple times with different payment ids for the same table, multiple payments will be added to the reservation. Note: if two payments are registered with the same id for the same reservation, only the first one will be registered, as the api assumes that this is a duplicated record sent by accident.
+
+```
+PUT /venues/{venueId}/table/{tableId}/payment
+```
+
+#### Input Parameters
+| Parameter | Location     | Type    | Description                                                  |
+|-----------|--------------|---------|--------------------------------------------------------------|
+| venueId   | Path         | string  | Venue identifier                                             |
+| tableId | Path | string  | Table identifier. |
+| paymentId      | Body | string  | Any string identifying the payment (optional). |
+| amount      | Body | number  | Amount paid. |
+| currency      | Body | string  | Currency of payment. Possible values: 'MXN' |
+| tableNumber | Body | string | Table number or identifier, as it is displayed to the final user.|
+| paxs | Body | number | Number of people in the group.|
+| hasDiscount | Body | boolean | True if a discount was applied to this table. (Optional, false by default) |
+| discountName | Body | string | Name of the discount applied (optional). |
+| discountAmount | Body | number | The amount of the discount applied, if any. (Optional, default: 0)|
+| checkNumber | Body | string | The check nunber of the table. (optional)|
+| checkUrl | Body | string | Check url containing a PDF file or image of the check (optional)|
+| events | Body | [events](./Events.md) | Date and user information about events detailed [here](./Events.md). (Optional)|
+| reservationDate | Body | string | Reservation date. Format: "yyyy-mm-dd". Optional, only needed when reservation is closed and it is needed to patch payments not registered for some reason.|
+
+#### Output Parameters
+If the payment was successfully registered, the following parameters are returned:
+
+| Parameter | Type    | Description                                            |
+|-----------|---------|--------------------------------------------------------|
+| code      | string  | Reservation code                                       |
+| date      | string  | Reservation date in "yyyy-MM-dd" format.               |
+| time      | string  | Reservation time in "HH:mm" 24-hour notation format.   |
+| paxs      | int     | Number of people in the group.                         |
+| tableId      | string     | Table identifier                         |
+| customerName | string | Full name of the customer associated with the reservation |
+| conciergeName | string | Name of the concierge that generated the reservation |
+| totalPaidAmount | number | Total amount paid for this order (sum of all payments received) |
+| currency      | string  | Currency of payments. |
+| payments  | array | Array of [payment](./Payment.md) objects|
+
+#### Error Codes
+The following HTTP Status Codes can be returned by this endpoint:
+
+| Code      | Status    | Description                                            |
+|-----------|---------|--------------------------------------------------------|
+| 200       | OK      | The payment was successfully registered. |
+| 400       | Bad Request | The reservation was found but it is not valid for receiving payments. One of the following error codes are returned in the response: <br>- `MAX_PAYMENTS_REACHED`: The number of payments received for this reservation has reached its limit.|
+| 404       | Not Found | The reservation was not found or it is  not confirmed (for example: it has been cancelled).|
+
+#### Example
+
+Example request:
+```bash
+curl --location --request PUT 'https://wr-api.wellet.dev/venues/chambao-cancun/table/12/payment' \
+--header 'x-api-key: YOUR_API_KEY' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "paymentId": "ABC123",
+    "amount": 15383.25,
+    "currency": "MXN",
+    "paxs": 8,
+    "hasDiscount": true,
+    "discountName": "Locales",
+    "discountAmount": 1709.25,
+    "checkNumber": "205",
+    "checkUrl": "https://billing-xyz.com/checks/check205.pdf",
+}'
+```
+
+Example response:
+```json
+{
+    "code": "GFAL",
+    "date": "2024-01-04",
+    "time": "20:30",
+    "paxs": 8,
+    "tableId": 12,
+    "customerName": "Eduardo Lopez",
+    "conciergeName": "Valeria Pérez",
+    "totalPaidAmount": 20383.25,
+    "currency": "MXN",
+    "payments": [
+        {
+            "id": "ABC122",
+            "amount": 5000.00,
+            "currency": "MXN",
+            "createdAtUtc": "2024-01-04T21:01:53.31"
+        },
+        {
+            "id": "ABC123",
+            "amount": 15383.25,
+            "currency": "MXN",
+            "createdAtUtc": "2024-01-05T21:05:03.3706244Z"
+        }
+    ]
+}
+```
+
