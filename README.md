@@ -51,20 +51,16 @@ Example response:
 ```json
 [
     {
-        "id": "chambao-cancun",
-        "name": "Chambao Cancún",
+        "id": "acme",
+        "name": "Acme Resto",
     },
     {
-        "id": "chambao-tulum",
-        "name": "Chambao Tulum",
+        "id": "bites",
+        "name": "Bites",
     },
     {
-        "id": "parole-cancun",
-        "name": "Parole Cancún",
-    },
-    {
-        "id": "parole-tulum",
-        "name": "Parole Tulum",
+        "id": "fuego",
+        "name": "Fuego Resto",
     }
 ]
 ```
@@ -96,7 +92,7 @@ Returns an array of reservations, each of them with the following properties:
 
 Example request:
 ```bash
-curl --location --request GET 'https://wr-api.wellet.dev/venues/chambao-cancun/reservations?date=2024-01-04' \
+curl --location --request GET 'https://wr-api.wellet.dev/venues/acme/reservations?date=2024-01-04' \
 --header 'x-api-key: YOUR_API_KEY'
 ```
 
@@ -162,7 +158,7 @@ If the reservation is found and it is confirmed, returns a reservation with the 
 
 Example request:
 ```bash
-curl --location --request GET 'https://wr-api.wellet.dev/venues/chambao-cancun/reservations/GFAL' \
+curl --location --request GET 'https://wr-api.wellet.dev/venues/acme/reservations/GFAL' \
 --header 'x-api-key: YOUR_API_KEY'
 ```
 
@@ -256,7 +252,7 @@ The following HTTP Status Codes can be returned by this endpoint:
 
 Example request:
 ```bash
-curl --location --request PUT 'https://wr-api.wellet.dev/venues/chambao-cancun/reservations/GFAL/payment' \
+curl --location --request PUT 'https://wr-api.wellet.dev/venues/acme/reservations/GFAL/payment' \
 --header 'x-api-key: YOUR_API_KEY' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -361,7 +357,7 @@ If the reservation is found and it is confirmed, returns a reservation with the 
 
 Example request:
 ```bash
-curl --location --request POST 'https://wr-api.wellet.dev/venues/chambao-cancun/table/12/open' \
+curl --location --request POST 'https://wr-api.wellet.dev/venues/acme/table/12/open' \
 --header 'x-api-key: YOUR_API_KEY'
 ```
 
@@ -472,7 +468,7 @@ The following HTTP Status Codes can be returned by this endpoint:
 
 Example request:
 ```bash
-curl --location --request PUT 'https://wr-api.wellet.dev/venues/chambao-cancun/table/12/payment' \
+curl --location --request PUT 'https://wr-api.wellet.dev/venues/acme/table/12/payment' \
 --header 'x-api-key: YOUR_API_KEY' \
 --header 'Content-Type: application/json' \
 --data-raw '{
