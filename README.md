@@ -204,8 +204,12 @@ PUT /venues/{venueId}/reservations/{reservationCode}/payment
 | venueId   | Path         | string  | Venue identifier                                             |
 | reservationCode | Path | string  | Reservation code. |
 | paymentId      | Body | string  | Any string identifying the payment (optional). |
-| amount      | Body | number  | Amount paid. |
+| amount      | Body | number  | Commissionable amount for this check. |
 | currency      | Body | string  | Currency of payment. Possible values: 'MXN' |
+| total      | Body | number  | The final amount the guest needs to pay, which includes the subtotal, tax, and any service charges (optional). |
+| subtotal      | Body | number  | The total cost of all items ordered before any additional charges, like tax or service fees (optional). |
+| tax      | Body | number  | The government-imposed tax on the bill amount, usually a percentage of the subtotal (optional). |
+| serviceCharge      | Body | number  | An optional fee added by the venue, often used as a tip or to cover staffing costs (optional). |
 | tableNumber | Body | string | Table number or identifier, as it is displayed to the final user.|
 | paxs | Body | number | Number of people in the group.|
 | openedAt | Body | date | Timestamp when this particular table was opened in the system. Format: `yyyy-MM-ddTHH:mm:ss` (ISO 8601 format in local time)|
@@ -216,6 +220,8 @@ PUT /venues/{venueId}/reservations/{reservationCode}/payment
 | checkUrl | Body | string | Check url containing a PDF file or image of the check (optional)|
 | events | Body | [events](./Events.md) | Date and user information about events detailed [here](./Events.md). (Optional)|
 | reservationDate | Body | string | Reservation date. Format: "yyyy-mm-dd". Optional, only needed when reservation is closed and it is needed to patch payments not registered for some reason.|
+| items | Body | Array of [items](./CheckItems.md) | Collection of products ordered along with its quantity and price. |
+
 
 #### Output Parameters
 If the payment was successfully registered, the following parameters are returned:
@@ -283,6 +289,38 @@ curl --location --request PUT 'https://wr-dev.wellet.dev/venues/chambao-cancun/r
             "userFullName": "Luis Gonzalez"
         }
     },
+    items: [
+        {
+            "name": "Hokkien Street Noodles",
+            "quantity": 8,
+            "price": 2400
+        },
+        {
+            "name": "Crispy Honey Shrimp",
+            "quantity": 3,
+            "price": 2080.00
+        },
+        {
+            "name": "Wok-Charred Brussel Sprouts",
+            "quantity": 3,
+            "price": 1800.60
+        },
+        {
+            "name": "Mojito",
+            "quantity": 8,
+            "price": 2400
+        },
+        {
+            "name": "Valhalla Reserve Cabernet",
+            "quantity": 3,
+            "price": 3200
+        },
+        {
+            "name": "Gold Sparkle Brut",
+            "quantity": 4,
+            "price": 3502.65
+        }
+    ]
 }'
 ```
 
@@ -313,3 +351,73 @@ Example response:
     ]
 }
 ```
+
+# Webhooks
+
+Webhooks serve as communication mechanism **from the Wellet platform to your platform**. They allow Wellet to automatically send real-time notifications and event data to your system whenever specific actions occur—such as opening a table or processing a payment. This push-based communication ensures that your platform stays synchronized with events happening in Wellet, without the need for manual polling or intervention.
+
+In contrast, **API endpoints operate in the opposite direction**: they are called by your platform to send data or request information from the Wellet platform.
+
+## Enabling Webhooks
+
+The following information is required for enabling Webhooks:
+
+* The webhook URL where you would like POST request payloads sent.
+* Custom request headers you would like sent with request payloads as key-value pairs in the following format
+Example: "Authorization:AuthToken##OtherHeader:HelloWorld"
+
+Contact the Wellet team if you need to enable webhooks in your platform.
+
+## Event overview
+Wellet generates event data that we can send you to inform you of activity related to Wellet reservations. Each event payload sent to webhooks has the following format:
+
+```javascript
+{
+    "object": "event",
+    "type": "EVENT TYPE",
+    "data": {
+        // specific payload for this event type
+    } 
+}
+```
+
+## Event types
+
+### `reservation.arrived` - Reservation Arrived
+This webhook event notifies that the guests of a reservation have arrived and are ready to be seated. This is particularly useful for integrating a POS system with Wellet, allowing the POS to automatically open the table and assign the corresponding reservation code, eliminating the need for manual intervention.
+
+### Payload description
+| Parameter | Type    | Description                                            |
+|-----------|---------|--------------------------------------------------------|
+| code      | string  | Reservation code. This code needs to be used when registering payments for this reservation ([endpoint](#register-a-payment-for-a-reservation)). |
+| venueId     | string  | Venue identifier. |
+| table     | string  | Table number where guests are or will be seated. Null if booking engine does not provide this information. |
+| prepayment | number  | Total amount prepaid for this reservation. |
+| discounts  | array of [discounts](./Discount.md) | Array of discounts for applying promotions, loyalty discounts, or special offers directly to the bill. Empty array if none. |
+
+
+### Payload example:
+
+```javascript
+{
+    "object": "event",
+    "type": "reservation.arrived",
+    "data": {
+        "code": "GFAL",
+        "venueId": "chambao-cancun",
+        "table": "12",
+        "prepayment": 123.45,
+        "discounts": [
+            {
+                "name": "Cliente Premium", 
+                "percentageDiscount": 8.5
+            }
+        ]
+    } 
+}
+```
+
+
+
+
+
