@@ -373,6 +373,9 @@ Wellet generates event data that we can send you to inform you of activity relat
 
 ```javascript
 {
+    "id": "0d9ef8e9-bb69-466e-abc6-c18e413de270",
+    "timestamp": "2024-10-29T19:56:55.7544784Z",
+    "apiVersion": "1.0",
     "object": "event",
     "type": "EVENT TYPE",
     "data": {
@@ -392,6 +395,8 @@ This webhook event notifies that the guests of a reservation have arrived and ar
 | code      | string  | Reservation code. This code needs to be used when registering payments for this reservation ([endpoint](#register-a-payment-for-a-reservation)). |
 | venueId     | string  | Venue identifier. |
 | table     | string  | Table number where guests are or will be seated. Null if booking engine does not provide this information. |
+| customerName | string | Full name of the customer associated with the reservation. |
+| paxs | number | Number of people in the group for this reservation. |
 | prepayment | number  | Total amount prepaid for this reservation. |
 | discounts  | array of [discounts](./Discount.md) | Array of discounts for applying promotions, loyalty discounts, or special offers directly to the bill. Empty array if none. |
 
@@ -400,12 +405,17 @@ This webhook event notifies that the guests of a reservation have arrived and ar
 
 ```javascript
 {
+    "id": "0d9ef8e9-bb69-466e-abc6-c18e413de270",
+    "timestamp": "2024-10-29T19:56:55.7544784Z",
+    "apiVersion": "1.0",
     "object": "event",
     "type": "reservation.arrived",
     "data": {
         "code": "GFAL",
         "venueId": "chambao-cancun",
         "table": "12",
+        "customerName": "Eduardo Lopez",
+        "paxs": 4,
         "prepayment": 123.45,
         "discounts": [
             {
