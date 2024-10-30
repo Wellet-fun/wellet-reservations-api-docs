@@ -220,7 +220,7 @@ PUT /venues/{venueId}/reservations/{reservationCode}/payment
 | checkUrl | Body | string | Check url containing a PDF file or image of the check (optional)|
 | events | Body | [events](./Events.md) | Date and user information about events detailed [here](./Events.md). (Optional)|
 | reservationDate | Body | string | Reservation date. Format: "yyyy-mm-dd". Optional, only needed when reservation is closed and it is needed to patch payments not registered for some reason.|
-| items | Body | Array of [items](./CheckItems.md) | Collection of products ordered along with its quantity and price. |
+| items | Body | Array of [items](./CheckItem.md) | Collection of products ordered along with its quantity and price. |
 
 
 #### Output Parameters
