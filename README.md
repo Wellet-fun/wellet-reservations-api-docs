@@ -397,7 +397,7 @@ This webhook event notifies that the guests of a reservation have arrived and ar
 | table     | string  | Table number where guests are or will be seated. Null if booking engine does not provide this information. |
 | customerName | string | Full name of the customer associated with the reservation. |
 | paxs | number | Number of people in the group for this reservation. |
-| prepayment | number  | Total amount prepaid for this reservation. |
+| prepayment | [Prepayment](./Prepayment.md)  | Prepayment information for this reservation. |
 | discounts  | array of [discounts](./Discount.md) | Array of discounts for applying promotions, loyalty discounts, or special offers directly to the bill. Empty array if none. |
 
 
@@ -416,10 +416,32 @@ This webhook event notifies that the guests of a reservation have arrived and ar
         "table": "12",
         "customerName": "Eduardo Lopez",
         "paxs": 4,
-        "prepayment": 123.45,
+        "prepayment": {
+            "total": 9500.23,
+            "currency": "MXN",
+            "credit": 4500,
+            "accessFee": 4000.23,
+            "products": [
+                {
+                    "id": "vip-lounge-03",
+                    "total": 9500.23,
+                    "credit": 4500,
+                    "accessFee": 4000.23,
+                    "paxs": 4
+                }
+            ],
+            "payments": [
+                {
+                    "id": "chrg-343523",
+                    "amount": 9500.23,
+                    "currency": "MXN",
+                    "createdAtUtc": "2024-10-22T14:32:12"                   
+                }
+            ]
+        }
         "discounts": [
             {
-                "name": "Cliente Premium", 
+                "name": "Premium Customer", 
                 "percentageDiscount": 8.5
             }
         ]
