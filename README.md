@@ -395,7 +395,7 @@ This webhook event notifies that the guests of a reservation have arrived and ar
 | code      | string  | Reservation code. This code needs to be used when registering payments for this reservation ([endpoint](#register-a-payment-for-a-reservation)). |
 | venueId     | string  | Venue identifier. |
 | table     | string  | Table number where guests are or will be seated. Null if booking engine does not provide this information. |
-| customerName | string | Full name of the customer associated with the reservation. |
+| customer | [Customer](/Customer.md) | Customer associated with the reservation. |
 | paxs | number | Number of people in the group for this reservation. |
 | prepayment | [Prepayment](./Prepayment.md)  | Prepayment information for this reservation. |
 | discounts  | array of [discounts](./Discount.md) | Array of discounts for applying promotions, loyalty discounts, or special offers directly to the bill. Empty array if none. |
@@ -414,7 +414,12 @@ This webhook event notifies that the guests of a reservation have arrived and ar
         "code": "GFAL",
         "venueId": "chambao-cancun",
         "table": "12",
-        "customerName": "Eduardo Lopez",
+        "customer": {
+            firstName: "Eduardo",
+            lastName: "Lopez",
+            email: "elopez@test.com",
+            phone: "+521235677890"
+        },
         "paxs": 4,
         "prepayment": {
             "total": 9500.23,
@@ -423,7 +428,8 @@ This webhook event notifies that the guests of a reservation have arrived and ar
             "accessFee": 4000.23,
             "products": [
                 {
-                    "id": "vip-lounge-03",
+                    "id": "SER025",                    
+                    "locationId": "Palapa",
                     "total": 9500.23,
                     "credit": 4500,
                     "accessFee": 4000.23,

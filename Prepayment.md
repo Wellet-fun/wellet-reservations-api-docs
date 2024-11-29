@@ -16,6 +16,7 @@ Represents a deposit prepaid by a customer to secure the reservation.
 | Parameter      | Type    | Description                                           |
 |----------------|---------|-------------------------------------------------------|
 | id             | string | Product identifier                                    |
+| locationId     | string | Identifier of the product location (optional) |
 | total         | number  | Total amount prepaid for this product                     |
 | credit       | number  | The portion of the prepaid amount that serves as a credit toward the final bill. |
 | accessFee   | number   | The portion of the prepaid amount charged for access to this product. |
