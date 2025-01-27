@@ -12,8 +12,8 @@ The Reservations API is served over HTTPs. All URLs referenced in the documentat
 
 | Environment |          Base URL           |
 |:-----------:|:---------------------------:|
-| Production  | https://wr-api.wellet.cloud |
-| Sandbox     | https://wr-api.wellet.dev   |
+| Production  | https://rt-api.wellet.cloud |
+| Sandbox     | https://rt-api.wellet.dev   |
 
 ## Authentication
 
@@ -43,7 +43,7 @@ Returns an array of venue, each venue containing the following properties:
 
 Example request:
 ```bash
-curl --location --request GET 'https://wr-dev.wellet.dev/venues/' \
+curl --location --request GET 'https://rt-api.wellet.dev/venues/' \
 --header 'x-api-key: YOUR_API_KEY'
 ```
 
@@ -51,20 +51,16 @@ Example response:
 ```json
 [
     {
-        "id": "chambao-cancun",
-        "name": "Chambao Cancún",
+        "id": "acme",
+        "name": "Acme Resto",
     },
     {
-        "id": "chambao-tulum",
-        "name": "Chambao Tulum",
+        "id": "bites",
+        "name": "Bites",
     },
     {
-        "id": "parole-cancun",
-        "name": "Parole Cancún",
-    },
-    {
-        "id": "parole-tulum",
-        "name": "Parole Tulum",
+        "id": "fuego",
+        "name": "Fuego Resto",
     }
 ]
 ```
@@ -96,7 +92,7 @@ Returns an array of reservations, each of them with the following properties:
 
 Example request:
 ```bash
-curl --location --request GET 'https://wr-dev.wellet.dev/venues/chambao-cancun/reservations?date=2024-01-04' \
+curl --location --request GET 'https://rt-api.wellet.dev/venues/acme/reservations?date=2024-01-04' \
 --header 'x-api-key: YOUR_API_KEY'
 ```
 
@@ -151,7 +147,7 @@ If the reservation is found and it is confirmed, returns a reservation with the 
 
 Example request:
 ```bash
-curl --location --request GET 'https://wr-dev.wellet.dev/venues/chambao-cancun/reservations/GFAL' \
+curl --location --request GET 'https://rt-api.wellet.dev/venues/acme/reservations/GFAL' \
 --header 'x-api-key: YOUR_API_KEY'
 ```
 
@@ -205,7 +201,7 @@ PUT /venues/{venueId}/reservations/{reservationCode}/payment
 | reservationCode | Path | string  | Reservation code. |
 | paymentId      | Body | string  | Any string identifying the payment (optional). |
 | amount      | Body | number  | Commissionable amount for this check. |
-| currency      | Body | string  | Currency of payment. Possible values: 'MXN' |
+| currency      | Body | string  | Currency of payment. |
 | total      | Body | number  | The final amount the guest needs to pay, which includes the subtotal, tax, and any service charges (optional). |
 | subtotal      | Body | number  | The total cost of all items ordered before any additional charges, like tax or service fees (optional). |
 | tax      | Body | number  | The government-imposed tax on the bill amount, usually a percentage of the subtotal (optional). |
@@ -251,7 +247,7 @@ The following HTTP Status Codes can be returned by this endpoint:
 
 Example request:
 ```bash
-curl --location --request PUT 'https://wr-dev.wellet.dev/venues/chambao-cancun/reservations/GFAL/payment' \
+curl --location --request PUT 'https://rt-api.wellet.dev/venues/acme/reservations/GFAL/payment' \
 --header 'x-api-key: YOUR_API_KEY' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -352,6 +348,216 @@ Example response:
 }
 ```
 
+# Venue Events
+The `Event` object represents any scheduled activity or occasion at a specific venue where tickets or vip areas are available for purchase.
+
+## Get Events
+Retrieves a list of all events scheduled within a specified date range, including events that have already occurred in the past.
+
+```
+GET /venues/{venueId}/events?startDate={startDate}&endDate={endDate}
+```
+
+#### Input Parameters
+| Parameter | Location     | Type    | Description                                                  |
+|-----------|--------------|---------|--------------------------------------------------------------|
+| venueId   | Path         | string  | Venue identifier                                             |
+| startDate | Query String | string  | The start date (in the venue's local time) of the range in ISO 8601 format (e.g., 2025-12-22). Only events starting on or after this date will be included.|
+| endDate | Query String | string  | The end date (in the venue's local time) of the range in ISO 8601 format (e.g., 2025-12-31). Only events ending on or before this date will be included.|
+
+#### Output Parameters
+Returns an array of events, each of them with the following properties:
+
+| Parameter | Type    | Description                                            |
+|-----------|---------|--------------------------------------------------------|
+| id      | string  | A unique identifier for the event.                        |
+| startDateTime      | date  | The local date and time when the event begins. Format: `yyyy-MM-ddTHH:mm:ss` (ISO 8601 format in local time). |
+| endDateTime      | date  | The local date and time when the event ends. Format: `yyyy-MM-ddTHH:mm:ss` (ISO 8601 format in local time). |
+| name      | string     | The name of the event, as displayed to users.  |
+| venueId     | string  | Venue identifier. |
+
+#### Example
+
+Example request:
+```bash
+curl --location --request GET 'https://rt-api.wellet.dev/venues/acme/events?startDate=2025-01-10&endDate=2025-01-17' \
+--header 'x-api-key: YOUR_API_KEY'
+```
+
+Example response:
+```json
+[
+    {
+        "id": "infinite-vibes",
+        "startDateTime": "2025-01-13T22:00:00",
+        "endDateTime": "2025-01-14T02:00:00",
+        "name": "Infinite Vibes",
+        "venueId": "acme"
+    },
+    {
+        "id": "feel-good-fridays",
+        "startDateTime": "2025-01-16T22:00:00",
+        "endDateTime": "2025-01-17T02:00:00",
+        "name": "Feel Good Fridays",
+        "venueId": "acme"
+    } 
+]
+```
+
+# Transaction
+Represents a transaction made for a specific event, such as the purchase of a ticket, a VIP table reservation, a cocktail package, etc.
+
+## Get list of transactions for an event
+Returns a list of transactions made for a specific event.
+```
+GET /venues/{venueId}/events/{eventId}/transactions
+```
+#### Input Parameters
+| Parameter | Location     | Type    | Description                                                  |
+|-----------|--------------|---------|--------------------------------------------------------------|
+| venueId   | Path         | string  | Venue identifier                                             |
+| eventId | Path | string  | Event identifier. |
+
+#### Output Parameters
+| Parameter | Type    | Description                                            |
+|-----------|---------|--------------------------------------------------------|
+| totalTransactions      | number  | Number of transactions for this event.                        |
+| totalPaid      | number  | The sum of all the amounts paid in the transactions for this event. |
+| currency      | string  | Currency for `totalPaid`. |
+| transactions      | Array of [Transaction](./Transaction.md)     | Array of all the transactions for this event.  |
+
+#### Example
+
+Example request:
+```bash
+curl --location --request GET 'https://rt-api.wellet.dev/venues/acme/events/infinite-vibes/purchases' \
+--header 'x-api-key: YOUR_API_KEY'
+```
+
+Example response:
+```json
+{
+    "totalTransactions": 2,
+    "totalPaid": 800.00,
+    "currency": "EUR",
+    "transactions": [
+        {
+            "id": 45678,
+            "referenceCode": "TGJM",
+            "confirmedAtUtc": "2025-01-12T14:32:12",
+            "totalPrice": 300,
+            "totalFees": 36,
+            "totalTips": 30,
+            "totalPaid": 300,
+            "currency": "EUR",
+            "paxs": 4,
+            "products": [
+                {
+                    "id": 2358,
+                    "name": "VIP Ticket",
+                    "quantity": 4,
+                    "totalPrice": 300,
+                    "totalFees": 36,
+                    "totalTips": 30
+                }
+            ]
+        },
+        {
+            "id": 48578,
+            "referenceCode": "FRDE",
+            "confirmedAtUtc": "2025-01-13T16:21:44",
+            "totalPrice": 500,
+            "totalFees": 60,
+            "totalTips": 15,
+            "totalPaid": 500,
+            "currency": "EUR",
+            "paxs": 4,
+            "products": [
+                {
+                    "id": 2358,
+                    "name": "VIP Ticket",
+                    "quantity": 2,
+                    "totalPrice": 150,
+                    "totalFees": 18,
+                    "totalTips": 15
+                },
+                {
+                    "id": 1348,
+                    "name": "Coctel personalizado",
+                    "quantity": 2,
+                    "totalPrice": 350,
+                    "totalFees": 42,
+                    "totalTips": 0
+                }
+            ]
+        },
+    ]
+}
+```
+
+## Get list of transactions
+Returns all transactions for a particular venue filtered by creation date or by `afterTransactionId`. 
+
+#### Input Parameters
+| Parameter | Location     | Type    | Description                                                  |
+|-----------|--------------|---------|--------------------------------------------------------------|
+| venueId   | Path         | string  | Venue identifier                                             |
+| fromDateUtc| Query String | date | Minimum transaction date in UTC. Format: "yyyy-mm-dd". |
+| toDateUtc| Query String | date | (optional) Maximum transaction date in UTC. Format: "yyyy-mm-dd". |
+| afterTransactionId | Path | string  | (optional) The unique identifier of the last processed transaction. Used to retrieve all transactions that occurred after this specific transaction for synchronization purposes. |
+
+#### Output Parameters
+Array of [Transactions](./Transaction.md) object with its corresponding [Event](#venue-events).
+
+#### Example
+
+Example request:
+```bash
+curl --location --request GET 'https://rt-api.wellet.dev/venues/acme/transactions?fromDateUtc=2025-01-01&afterTransactionId=45678' \
+--header 'x-api-key: YOUR_API_KEY'
+```
+
+Example response:
+```json
+[
+    {
+        "id": "0d9ef8e9-bb69-466e-abc6-c18e413de270",
+        "timestamp": "2025-01-12T14:32:12",
+        "apiVersion": "1.0",
+        "object": "event",
+        "type": "reservation.arrived",
+        "data": {
+            "id": 48578,
+            "referenceCode": "FRDE",
+            "confirmedAtUtc": "2025-01-12T14:32:12",
+            "totalPrice": 300,
+            "totalFees": 36,
+            "totalTips": 30,
+            "totalPaid": 300,
+            "currency": "EUR",
+            "paxs": 4,
+            "products": [
+                {
+                    "id": 2358,
+                    "name": "VIP Ticket",
+                    "quantity": 4,
+                    "totalPrice": 300,
+                    "totalFees": 36,
+                    "totalTips": 30
+                }
+            ],
+            "event": {
+            "id": "infinite-vibes",
+                "startDateTime": "2025-01-13T22:00:00",
+                "endDateTime": "2025-01-14T02:00:00",
+                "name": "Infinite Vibes",
+            }
+        } 
+    }
+]
+```
+
+
 # Webhooks
 
 Webhooks serve as communication mechanism **from the Wellet platform to your platform**. They allow Wellet to automatically send real-time notifications and event data to your system whenever specific actions occur—such as opening a table or processing a payment. This push-based communication ensures that your platform stays synchronized with events happening in Wellet, without the need for manual polling or intervention.
@@ -412,7 +618,7 @@ This webhook event notifies that the guests of a reservation have arrived and ar
     "type": "reservation.arrived",
     "data": {
         "code": "GFAL",
-        "venueId": "chambao-cancun",
+        "venueId": "acme",
         "table": "12",
         "customer": {
             firstName: "Eduardo",
@@ -455,7 +661,51 @@ This webhook event notifies that the guests of a reservation have arrived and ar
 }
 ```
 
+### `transaction.confirmed` - Transaction Confirmed
+This webhook event notifies that a transaction for purchasing products has been confirmed, which means that all the payments have been confirmed and accredited.
 
+### Payload description
+A [Transaction](./Transaction.md) object with its corresponding [Event](#venue-events).
+
+
+### Payload example:
+
+```javascript
+{
+    "id": "0d9ef8e9-bb69-466e-abc6-c18e413de270",
+    "timestamp": "2025-01-12T14:32:12",
+    "apiVersion": "1.0",
+    "object": "event",
+    "type": "reservation.arrived",
+    "data": {
+        "id": 45678,
+        "referenceCode": "TGJM",
+        "confirmedAtUtc": "2025-01-12T14:32:12",
+        "totalPrice": 300,
+        "totalFees": 36,
+        "totalTips": 30,
+        "totalPaid": 300,
+        "currency": "EUR",
+        "paxs": 4,
+        "products": [
+            {
+                "id": 2358,
+                "name": "VIP Ticket",
+                "quantity": 4,
+                "totalPrice": 300,
+                "totalFees": 36,
+                "totalTips": 30
+            }
+        ],
+        "event": {
+           "id": "infinite-vibes",
+            "startDateTime": "2025-01-13T22:00:00",
+            "endDateTime": "2025-01-14T02:00:00",
+            "name": "Infinite Vibes",
+        }
+    } 
+}
+```
 
 
 
