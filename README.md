@@ -495,7 +495,7 @@ Example response:
 }
 ```
 
-## Get list of transactions
+## Get list of transactions for a venue
 Returns all transactions for a particular venue filtered by creation date or by `afterTransactionId`. 
 
 #### Input Parameters
@@ -676,7 +676,7 @@ A [Transaction](./Transaction.md) object with its corresponding [Event](#venue-e
     "timestamp": "2025-01-12T14:32:12",
     "apiVersion": "1.0",
     "object": "event",
-    "type": "reservation.arrived",
+    "type": "transaction.confirmed",
     "data": {
         "id": 45678,
         "referenceCode": "TGJM",
