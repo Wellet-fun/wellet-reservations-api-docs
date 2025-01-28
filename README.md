@@ -496,7 +496,7 @@ Example response:
 ```
 
 ## Get list of transactions for a venue
-Returns all transactions for a particular venue filtered by creation date or by `afterTransactionId`. 
+Returns all transactions for a particular venue filtered by creation date or by `afterTransactionId`, ordered by date of creation or update. 
 
 #### Input Parameters
 | Parameter | Location     | Type    | Description                                                  |
@@ -521,39 +521,32 @@ Example response:
 ```json
 [
     {
-        "id": "0d9ef8e9-bb69-466e-abc6-c18e413de270",
-        "timestamp": "2025-01-12T14:32:12",
-        "apiVersion": "1.0",
-        "object": "event",
-        "type": "reservation.arrived",
-        "data": {
-            "id": 48578,
-            "referenceCode": "FRDE",
-            "confirmedAtUtc": "2025-01-12T14:32:12",
-            "totalPrice": 300,
-            "totalFees": 36,
-            "totalTips": 30,
-            "totalPaid": 300,
-            "currency": "EUR",
-            "paxs": 4,
-            "products": [
-                {
-                    "id": 2358,
-                    "name": "VIP Ticket",
-                    "quantity": 4,
-                    "totalPrice": 300,
-                    "totalFees": 36,
-                    "totalTips": 30
-                }
-            ],
-            "event": {
-            "id": "infinite-vibes",
-                "startDateTime": "2025-01-13T22:00:00",
-                "endDateTime": "2025-01-14T02:00:00",
-                "name": "Infinite Vibes",
+        "id": 48578,
+        "referenceCode": "FRDE",
+        "confirmedAtUtc": "2025-01-12T14:32:12",
+        "totalPrice": 300,
+        "totalFees": 36,
+        "totalTips": 30,
+        "totalPaid": 300,
+        "currency": "EUR",
+        "paxs": 4,
+        "products": [
+            {
+                "id": 2358,
+                "name": "VIP Ticket",
+                "quantity": 4,
+                "totalPrice": 300,
+                "totalFees": 36,
+                "totalTips": 30
             }
-        } 
-    }
+        ],
+        "event": {
+            "id": "infinite-vibes",
+            "startDateTime": "2025-01-13T22:00:00",
+            "endDateTime": "2025-01-14T02:00:00",
+            "name": "Infinite Vibes",
+        }
+    } 
 ]
 ```
 
