@@ -12,8 +12,8 @@ The Reservations API is served over HTTPs. All URLs referenced in the documentat
 
 | Environment |          Base URL           |
 |:-----------:|:---------------------------:|
-| Production  | https://rt-api.wellet.cloud |
-| Sandbox     | https://rt-api.wellet.dev   |
+| Production  | https://wr-api.wellet.cloud |
+| Sandbox     | https://wr-api.wellet.dev   |
 
 ## Authentication
 
@@ -43,7 +43,7 @@ Returns an array of venue, each venue containing the following properties:
 
 Example request:
 ```bash
-curl --location --request GET 'https://rt-api.wellet.dev/venues/' \
+curl --location --request GET 'https://wr-api.wellet.dev/venues/' \
 --header 'x-api-key: YOUR_API_KEY'
 ```
 
@@ -92,7 +92,7 @@ Returns an array of reservations, each of them with the following properties:
 
 Example request:
 ```bash
-curl --location --request GET 'https://rt-api.wellet.dev/venues/acme/reservations?date=2024-01-04' \
+curl --location --request GET 'https://wr-api.wellet.dev/venues/acme/reservations?date=2024-01-04' \
 --header 'x-api-key: YOUR_API_KEY'
 ```
 
@@ -147,7 +147,7 @@ If the reservation is found and it is confirmed, returns a reservation with the 
 
 Example request:
 ```bash
-curl --location --request GET 'https://rt-api.wellet.dev/venues/acme/reservations/GFAL' \
+curl --location --request GET 'https://wr-api.wellet.dev/venues/acme/reservations/GFAL' \
 --header 'x-api-key: YOUR_API_KEY'
 ```
 
@@ -247,7 +247,7 @@ The following HTTP Status Codes can be returned by this endpoint:
 
 Example request:
 ```bash
-curl --location --request PUT 'https://rt-api.wellet.dev/venues/acme/reservations/GFAL/payment' \
+curl --location --request PUT 'https://wr-api.wellet.dev/venues/acme/reservations/GFAL/payment' \
 --header 'x-api-key: YOUR_API_KEY' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -380,7 +380,7 @@ Returns an array of events, each of them with the following properties:
 
 Example request:
 ```bash
-curl --location --request GET 'https://rt-api.wellet.dev/venues/acme/events?startDate=2025-01-10&endDate=2025-01-17' \
+curl --location --request GET 'https://wr-api.wellet.dev/venues/acme/events?startDate=2025-01-10&endDate=2025-01-17' \
 --header 'x-api-key: YOUR_API_KEY'
 ```
 
@@ -430,7 +430,7 @@ GET /venues/{venueId}/events/{eventId}/transactions
 
 Example request:
 ```bash
-curl --location --request GET 'https://rt-api.wellet.dev/venues/acme/events/infinite-vibes/purchases' \
+curl --location --request GET 'https://wr-api.wellet.dev/venues/acme/events/infinite-vibes/purchases' \
 --header 'x-api-key: YOUR_API_KEY'
 ```
 
@@ -513,7 +513,7 @@ Array of [Transactions](./Transaction.md) object with its corresponding [Event](
 
 Example request:
 ```bash
-curl --location --request GET 'https://rt-api.wellet.dev/venues/acme/transactions?fromDateUtc=2025-01-01&afterTransactionId=45678' \
+curl --location --request GET 'https://wr-api.wellet.dev/venues/acme/transactions?fromDateUtc=2025-01-01&afterTransactionId=45678' \
 --header 'x-api-key: YOUR_API_KEY'
 ```
 
