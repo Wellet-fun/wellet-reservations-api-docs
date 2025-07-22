@@ -594,7 +594,7 @@ This webhook event notifies that the guests of a reservation have arrived and ar
 | code      | string  | Reservation code. This code needs to be used when registering payments for this reservation ([endpoint](#register-a-payment-for-a-reservation)). |
 | venueId     | string  | Venue identifier. |
 | table     | string  | Table number where guests are or will be seated. Null if booking engine does not provide this information. |
-| customer | [Customer](/Customer.md) | Customer associated with the reservation. |
+| customerName | string | Customer name associated with the reservation. |
 | paxs | number | Number of people in the group for this reservation. |
 | prepayment | [Prepayment](./Prepayment.md)  | Prepayment information for this reservation. |
 | discounts  | array of [discounts](./Discount.md) | Array of discounts for applying promotions, loyalty discounts, or special offers directly to the bill. Empty array if none. |
@@ -613,12 +613,7 @@ This webhook event notifies that the guests of a reservation have arrived and ar
         "code": "GFAL",
         "venueId": "acme",
         "table": "12",
-        "customer": {
-            firstName: "Eduardo",
-            lastName: "Lopez",
-            email: "elopez@test.com",
-            phone: "+521235677890"
-        },
+        "customerName": "Eduardo Lopez",
         "paxs": 4,
         "prepayment": {
             "total": 9500.23,
